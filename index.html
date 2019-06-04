@@ -1,0 +1,2115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>welcome Page</title>
+<meta name="stylesheet" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="js/jquery.mobile-1.4.5.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+
+
+
+<link rel="stylesheet" href="leaflet/leaflet.css"/>
+<script src="leaflet/leaflet.js"></script>
+
+<script type="text/javascript">
+
+
+
+	
+	if(navigator.geolocation == undefined){ 
+		alert("Geolocation undefined");
+	}else{
+		alert("Geolocation available");
+		navigator.geolocation.getCurrentPosition(userLocated,locationError);
+	};
+	
+
+	function userLocated(position){
+				var latitude=position.coords.latitude;
+				var longitude = position.coords.longitude;
+                var mymap = L.map('mapid').setView([latitude, longitude], 16);
+             
+		alert("Lat: "+latitude+", Long: "+longitude);
+
+
+		
+		
+		
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}',{
+
+		maxZoom: 12,
+		attribution:'Map data & copy;'+'<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+ 'contributors,<a href="https://creativecommons.org/licenses'+ '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+'www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox.streets',
+		accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+
+	
+
+}).addTo(mymap);
+	var marker = L.marker([latitude, longitude]).addTo(mymap);
+marker.bindPopup("You're here").openPopup();
+	//current location
+	var circle = L.circle([latitude,longitude], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 1000
+}).addTo(mymap);
+
+	//Mauritius Glass Gallery 
+ var marker1= L.marker([-20.273680,57.497410]).addTo(mymap);
+     marker1.bindPopup("Mauritius Glass Gallery  ").openPopup();
+
+
+     
+	};
+
+	
+
+
+
+
+     
+	
+
+
+	function locationError(error){
+		switch(error.code){
+			case error.PERMISSION_DENIED:
+			alert("Permission Denied- "+error.message);
+			break;
+
+			case error.POSITION_UNAVAILABLE:
+			alert("Position Not Available-"+error.message);
+			break;
+
+			case error.TIMEOUT:
+			alert("Request Time out-"+error.message);
+			break;
+		}
+	};
+
+
+//SQLIte Database
+
+ document.addEventListener("deviceready", onDeviceReady,false);
+
+ function onDeviceReady(){
+ 	db = window.openDatabase("mycompanyDB","1.0", "Recyclers in mauritius", 2*1024*1024*1024*1024*1024*1024);
+ 	db.transaction(errorCB , successCB);
+ }
+
+function createDB(tx){
+ 	tx.executeSql('DROP TABLE IF EXISTS book');
+ tx.executeSql('CREATE TABLE IF NOT EXISTS company(id INT, Category TEXT, Company TEXT,Address TEXT,Contact Numeric)');
+ }
+
+ function errorCB(err){
+ 	alert("SQL Error: "+err.code);
+
+ }
+
+ function successCB(){
+ 	alert("Database & Table Created");
+ }
+
+ function insertDB(tx){
+ 	var Category= $("[name='Category']").val();
+ 	var Company =$("[name='Company']").val();
+ 	var Address= $("[name='Address']").val();
+ 	var Contact=$("[name='Contact']").val();
+ 	var sql='INSERT INTO company (Category,Company,Address,Contact) VALUES (?,?,?,?)';
+ 	tx.executeSql(sql,[Category,Company,Address,Contact], successQueryBD, errorCB);
+ }
+
+ function successQueryBD(tx){
+ 	alert("record inserted");
+ 	tx.executeSql('SELECT * FROM company ', [], renderListCB, errorCB);
+ }
+//search function
+function searchQueryBD(tx){
+	alert("search completed");
+ 	var category= $("[name='test']").val();
+ 	
+
+ tx.executeSql('SELECT * FROM company WHERE Category ==  "category" ', [],rendersearchCB );
+ 	
+ }
+ 
+  
+
+//search
+ function rendersearchCB(tx, results){
+ 	var htmlString ='';
+ 	var len = results.rows.length;
+
+ 	for(var i=0; i<len; i++){
+ 		htmlString+='<li>'+results.rows.item(i).Company+'<br>'+'</li>'+'<br>'+results.rows.item(i).Address;
+ 	}
+ 	$('#resultsearch').html(htmlString);
+
+ 	$('#resultsearch').listview('refresh');
+
+ }
+ function renderListCB(tx, results){
+ 	var htmlString ='';
+ 	var len = results.rows.length;
+
+ 	for(var i=0; i<len; i++){
+ 		htmlString+='<li>'+results.rows.item(i).Category+'<br>'+results.rows.item(i).Company+'<br>'+'</li>'+'<br>'+results.rows.item(i).Address+'</li>'+'<br>'+results.rows.item(i).Contact+'</li>';
+ 	}
+ 	$('#resultList').html(htmlString);
+ 	$('#resultList').listview('refresh');
+
+ }
+
+ //search
+ function search(){
+  //onDeviceReady();
+db = window.openDatabase("mycompanyDB","1.0", "Recyclers in mauritius", 2*1024*1024*1024*1024*1024*1024);
+ db.transaction(searchQueryBD);
+ $.mobile.changePage("#pageresult",{reverse:false,transaction:"slide"});
+ 	return false;}
+
+
+ function submitForm(){
+ onDeviceReady();
+ db.transaction(insertDB, errorCB);
+ $.mobile.changePage("#pagesearch",{reverse:false,transaction:"slide"});
+ 	return false;
+ }
+
+
+ </script>	
+
+
+	
+
+
+	
+
+
+
+<style>
+
+#pagediy,#diy,img{
+		padding: 10px;
+		
+
+	}
+ @media screen and (max-width:600px){
+	.responsive {
+		width: 100%;
+		padding: 10px;
+		height: auto;
+	}
+
+	.topnav input[type=text], .topnav .search-container button {
+    float: none;
+    display: block;
+    text-align: left;
+    width: 50%;
+    margin: 0;
+    padding: 14px;
+  }
+  .topnav input[type=text] {
+    border: 1px solid #ccc; 
+    width: 25px; 
+  }
+
+	
+}
+
+.topnav .search-container {
+  float:right;
+width:150px;
+ overflow: hidden;
+}
+
+.topnav input[type=text] {
+  padding: 1px;
+  margin-top: 1%;
+  font-size: 10px;
+  border: none;
+  width: 80px;
+}
+
+.topnav .search-container button {
+  float:right; 
+  padding: 1px;
+  margin-right: 1px;
+  background: #ddd;
+  font-size: 12px;
+  width: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.topnav .search-container button:hover {
+  background: #ccc;
+}
+
+
+
+.ui-icon-myicon:after {
+	background-image: url("img/scienceicon.png");
+	background-size: 22px 22px;
+}
+
+.ui-icon-myiconlocation:after {
+	background-image: url("img/locationlogo.jpg");
+	background-size: 22px 22px;
+}
+
+.ui-icon-myiconrecycle:after {
+	background-image: url("img/recycleicon.jpg");
+	background-size: 22px 22px;
+}
+
+.ui-icon-myiconcat:after {
+	background-image: url("img/cat1.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat2:after {
+	background-image: url("img/cat2.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat3:after {
+	background-image: url("img/cat3.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat4:after {
+	background-image: url("img/cat4.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat5:after {
+	background-image: url("img/cat5.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat6:after {
+	background-image: url("img/cat6.png");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat7:after {
+	background-image: url("img/cat7.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat8:after {
+	background-image: url("img/cat8.png");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat9:after {
+	background-image: url("img/cat9.png");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat10:after {
+	background-image: url("img/cat10.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat11:after {
+	background-image: url("img/cat11.gif");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat12:after {
+	background-image: url("img/cat12.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat13:after {
+	background-image: url("img/cat13.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat14:after {
+	background-image: url("img/cat14.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat15:after {
+	background-image: url("img/cat15.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat16:after {
+	background-image: url("img/cat16.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat17:after {
+	background-image: url("img/cat17.jpg");
+	background-size: 28px 28px;
+}
+.ui-icon-myiconcat18:after {
+	background-image: url("img/cat18.jpg");
+	background-size: 28px 28px;
+}
+
+
+
+	 #main p {
+	 	text-align: justify;
+	 	font-size: 14px;
+	}
+
+	
+	p,ul {
+		text-align: justify;
+		font-size: 14px;
+	}
+
+	#video{
+		width: 100%;
+		height: 300px;
+
+	}
+
+	.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 15px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 14px;
+  transition: 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #ccc; 
+}
+
+.panel {
+  padding: 0 18px;
+  display: none;
+  background-color: white;
+  overflow: hidden;
+}
+
+ #selectcat li a {
+	font-size: 14px;
+	font:sans-serif;
+	background-color: #d5e1df;
+	margin-bottom: 2px;
+}
+
+ 
+
+.dropdown {
+  position:relative; 
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #8b6f47;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(2,8,1,10.4);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #8b6f47;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+	<div data-role="page" id="pageone" data-theme="a">
+
+		<div data-role="header">
+	
+<div class="topnav">
+  
+  <div class="search-container">
+    <form action="/action_page.php">
+      <input align="right" type="text"  placeholder="Search.." name="search"/>
+      
+    </form>
+
+      
+  </div>
+  <a href="#pagesearch" data-icon="search" > search</a>
+  <a href="#pageinput" data-icon="search" > Input</a>
+
+</div>
+
+			<h1>Recycle Guide</h1>
+			
+			<div data-role="navbar" class="topnav">
+				
+				
+				<ul>
+					<li><a href="#pageone" class="active" data data-icon="home">Home</a></li>
+					<li><a href="#pagecat" data-transition="slide" data-icon="grid">Category</a></li>
+					<li><a href="#pagediy" data-transition="slide" data-icon="recycle">DIY</a></li>
+					<li><a href="#pagescience" data-transition="slide" class="ui-shadow ui-icon-myicon" data-icon="data-science">science</a></li>
+
+					<div class="dropdown">
+					<li class="dropdown"><a href="#pagelocation" class="dropdown"  data-transition="slide" class="ui-shadow ui-icon-myiconlocation" data-icon="location">Recycling</a>
+						<div class="dropdown-content">
+						<a href="#pageglass">Glass</a>
+						<a href="#geo_plastic.html">Plastic</a>
+						<a href="#geo_carton.html">Carton</a>
+						<a href="#geo_electric.html">Electric</a>
+						<a href="#pagepaper">Paper</a>
+						<a href="#geo_printing.html">Printing</a></div>
+					</li>
+					</div>
+				</ul>
+			</div>
+		</div> <!-- hearder 1 -->
+
+		<div role="main" id="main" class="ui-content">
+
+			<!-- slide page to go to category -->
+
+			<p>Why recycle ?</p>
+		
+		<p>Mauritius, with total population of around 1.3 million, generates about 1,488 tonnes of waste daily.  In 2018, the total volume of wastes disposed at the Mare Chicose Landfill was 543,196 tonnes which is the sole landfill on the island.​</p>
+
+        <p>The Ministry, through the Solid Waste Management Division, is responsible for the protection of the environment and public health through a proper management of solid and hazardous waste.​​</p>
+
+        <p>Government spends around Rs1.5 billion annually on waste management, including waste collection (on some housing estates, coastal villages, traffic centres and public beaches), operation and maintenance of transfer stations and transportation of wastes to landfill, and, operation and maintenance of the landfill site.  The Local Authorities altogether spend around Rs 990 million annually on waste collection services</p>
+		
+   <div class="row">
+  
+    <img src="img/home1.png" class="responsive">
+  
+    <img src="img/home2.png" class="responsive">
+  
+    <img src="img/home3.png" class="responsive">
+  
+    <img src="img/home4.png" class="responsive">
+  </div>
+</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019 </h2>
+		</div>
+</div>
+<!-- page 2 start here -->
+
+<div data-role="page" id="pagecat" data-theme="a">
+
+
+<div data-role="header">
+	
+<div class="topnav">
+  
+  <div class="search-container">
+    <form action="/action_page.php">
+      <input align="right" type="text" type="submit" placeholder="Search.." name="search">
+    </form>
+  </div>
+</div>
+
+			<h1>Recycle Guide</h1>
+			
+			<div data-role="navbar" class="topnav">
+				
+				
+				<ul>
+					<li><a href="#pageone" class="active" data data-icon="home">Home</a></li>
+					<li><a href="#pagecat" data-transition="slide" data-icon="grid">Category</a></li>
+					<li><a href="#pagediy" data-transition="slide" data-icon="recycle">DIY</a></li>
+					<li><a href="#pagescience" data-transition="slide" class="ui-shadow ui-icon-myicon" data-icon="data-science">science</a></li>
+					<div class="dropdown">
+					<li class="dropdown"><a href="#pagelocation" class="dropdown"  data-transition="slide" class="ui-shadow ui-icon-myiconlocation" data-icon="location">Recycling</a>
+						<div class="dropdown-content">
+						<a href="#pagepaper">Paper</a>
+						<a href="">Plastic</a>
+						<a href="">Carton</a>
+						<a href="">Electric</a>
+						<a href="">Glass</a>
+						<a href="">Printing</a></div>
+					</li>
+					</div>
+				</ul>
+			</div>
+		</div> <!-- hearder 1 -->
+
+<div data-role="header"> <!-- Toolbar -->
+	
+
+			<h1>Recycling Categories</h1>
+
+		 </div><!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<!-- menu for choosing category collapsible block -->
+			<form method="post" action="demoform.asp">
+				<fieldset class="ui-field-contain">
+					
+					<!--<div data-role="collapsible"> collapsible block -->
+				<h4>Select Category</h4>
+				<ul id="selectcat" data-role="listview" data-inset="true" class="nodisc-icon ui-alt-icon">
+
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat" href="#batterries">Batterries</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat2" href="#building_material">Building Materials</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat3" href="#clinical_waste">Clinical Waste</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat4" href="#composting">Composting</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat5" href="#computer">Computers</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat6" href="#electrical_equipment">Electrical Equipment</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat7" href="#furniture">Furniture</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat8" href="#glass">Glass</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat9" href="#metal">Metal</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat10" href="#mobiles">Mobiles</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat11" href="#paint">Paint/Oil</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat12" href="#paper">Paper</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat13" href="#plastic">Plastic</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat14" href="#printer_ink">Printer Cartridges</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat15" href="#recycling_bank">Recycling Banks</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat16" href="#textiles">Textiles</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat17" href="#vehicles">Vehicles</a></li>
+				<li><a class="ui-btn ui-shadow ui-btn-icon-right ui-icon-myiconcat18" href="#wood">Wood</a></li>
+				</ul>
+				
+			
+				</fieldset>
+			</form>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of pagecat  -->
+
+<!-- page button batteries start here -->
+<div data-role="page" id="batterries" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Batteries</h1>
+<a href="#diyvideo1" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<img src="img/batterypic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>All waste batteries are classified as hazardous waste and recycling is always the best option.</li>
+					<li>Ordinary household batteries do contain some hazardous chemicals so ideally should not be thrown out with the day to day rubbish.</li>
+						<li>Rechargeable batteries contain harmful metals, so should never be thrown away with daily rubbish, they should be returned to manufacturer for disposal or recycled elsewhere.</li>
+							<li>Local councils or garages sometimes offer battery-recycling services.</li>
+							<li>Contact your local council to see if they are running a battery collection scheme.</li>
+							<li>Ordinary batteries require a lot of energy to make, so in order to save energy, use rechargeable batteries and electricity mains instead of ordinary batteries.</li>
+							<li>Rechargable batteries are the most environmentally friendly option as can last for up to several hundred charging cycles resulting in less waste being produced.</li>
+						</ul>
+			</p>
+			<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h5> &copy  Recycle Guide 2019  </h5>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button building start here -->
+<div data-role="page" id="building_material" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Building Materials</h1>
+<a href="#diyvideo2" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!--end of hearder  -->
+
+		<div role="main" class="ui-content">
+
+			<img src="img/buildmaterialpic.jpg"  width="250px" height="250px">
+			<br>
+
+			<p>
+				<ul>
+					<li>Buildings are made from many materials, many of which are recyclable such as metal, wood, glass, etc. Recycle these materials accordingly.</li>
+					<li>Architectural salvage yards may take some items for reselling.</li>
+					<li>Many building materials can be reused, such as bricks and wood.</li>
+				</ul>
+			</p>
+			<br>
+			
+			<br>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!--SQLite database -->
+<div data-role="page" id="pageinput" data-theme="a">
+ <div data-role="header">
+ <h1>Insert Company Details</h1>
+ </div>
+ <div data-role="main" class="ui-content">
+ <form method="post" onSubmit="return submitForm()">
+<!--Category -->
+<label class="ui-hidden-accessible">Category</label>
+<input
+name="Category" type="text" placeholder="Category"/>
+<!--company name -->
+<label class="ui-hidden-accessible">Company</label>
+<input
+name="Company" type="text" placeholder="Company"/>
+<!-- address-->
+<label class="ui-hidden-accessible">Address</label>
+<input
+name="Address" type="text" placeholder="Address"/>
+<!-- Contact-->
+<label class="ui-hidden-accessible">Contact number</label>
+<input
+name="Contact" type="text" placeholder="Contact"/>
+
+ <input type="submit" value="submit"/>
+ </form>
+</div>
+ <div data-role="footer">
+ <h1>SQLite Database</h1>
+ </div>
+</div>
+
+<div data-role="page" id="pagesearch" data-theme="a">
+ <div data-role="header">
+ <h1> Recyclers Details</h1>
+ </div>
+ <!--Search bar -->
+<label class="ui-hidden-accessible">Category Name</label>
+<input
+name="test" type="text" placeholder="search by category"/>
+<input type="Button" value="Search"  onclick="return search()" />
+
+ <div data-role="main" class="ui-content">
+ <div id="output"><ul data-role="listview" id="resultList"></ul></div>
+
+</div>
+ <div data-role="footer">
+ <h1>SQLite Database</h1>
+ </div>
+</div>
+
+<div data-role="page" id="pageresult" data-theme="a">
+ <div data-role="header">
+ <h1> Search Result</h1>
+ </div>
+
+
+ <div data-role="main" class="ui-content">
+ <div id="output1"><ul data-role="listview" id="resultsearch"></ul></div>
+
+</div>
+ <div data-role="footer">
+ <h1>SQLite Database</h1>
+ </div>
+</div>
+
+<!-- page button clinical waste start here -->
+<div data-role="page" id="clinical_waste" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Clinical Waste</h1>
+<a href="#diyvideo3" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+
+			<img src="img/clinicalwastepic.png"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Clinical waste such as nappies, sanitary waste and medical supplies have the potential to be infectious so must be disposed of using special methods.</li>
+					<li>Be very careful when disposing of needles and syringes.</li>
+					<li>Look for doctors or manufacturer instructions of how to dispose of medical waste on the packaging containers.</li>
+					<li>Medicine containers can be recycled accordingly once it is empty.</li>
+					<li>Contact your local council to see if they offer free medical waste collection.</li>
+				</ul>
+			</p>
+			<br>
+			
+			<br>	
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button composting start here -->
+<div data-role="page" id="composting" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Composting</h1>
+<a href="#diyvideo4" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder  -->
+
+		<div role="main" class="ui-content">
+
+			<img src="img/compostpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				Composting is an excellent way to recycle kitchen and garden waste. It is very easy to build your own compost bin and use the compost to help your garden grow.
+			</p>
+
+			<p>
+				<h3>How Composting Works</h3>
+
+				<p>Composting is the decomposition of materials that originated from animals and plants. These organic materials can be things such as plant trimmings, vegetable cuttings, eggshells and teabags. The composting process produces a dark, crumbly matter that can be used as fertiliser in garden soil. The main stages of composting are:</p>
+
+				<ul>
+					<li>Adding organic materials to a compost bin.</li>
+					<li>Micro-organisms, such as bacteria and fungi, break sown the soft material.</li>
+					<li>This causes the compost pile to heat to around 60°C. This is the ideal temperature for micro-organisms to work at.</li>
+					<li>The compost pile then cools to below 30°C.</li>
+					<li>Small creatures such as worms and insects then break down the tougher material.</li>
+					<li>The whole process usually takes about 3 – 9 months, and results in a nutrient-rich fertiliser to use in your garden.</li>
+					<li>The compost that is ready to use can be taken from the bottom of the pile, leaving the rest to finish the process.</li>
+				</ul>
+				<p>
+					<h3>How to Build a Compost Bin</h3>
+				<ul>
+					<li>You can buy a compost bin or build your own. Compost bins are usually sold at DIY and gardening stores.</li>
+					<li>Build a compost bin by creating a frame out of wood and attach it to the ground using posts.</li>
+					<li>Your compost bin should be able to hold about 200-300 litres, try and use a bin with a lid to keep out the rain.</li>
+					<li>The compost bin should be placed in a well-lit and well-drained area of the garden.</li>
+					<li>Try and keep the compost bin out of the wind.</li>
+					<li>Improve drainage by breaking up the soil underneath the compost bin.</li>
+				</ul>
+			</p>
+
+			<p>
+				<h3>What You Should and Shouldn’t Compost</h3>
+				<h5>What to add to your compost pile:</h5>
+				<ul>
+					<li>Hair and fur</li>
+					<li>Shredded paper</li>
+					<li>Straw and hay</li>
+					<li>Animal bedding and sawdust</li>
+					<li>Crushed egg shells</li>
+					<li>Grass and plant cuttings</li>
+					<li>Raw fruit and vegetable trimmings</li>
+					<li>Teabags and coffee granules</li>
+					<li>Horse manure</li>
+					<li>Leaves</li>
+				</ul>
+			</p>
+
+			<p>
+				<h5>What not to add to your compost pile:</h5>
+				<ul>
+					<li>Meat or fish</li>
+					<li>Coal Ash</li>
+					<li>Animal waste</li>
+					<li>Nappies and used tissues</li>
+					<li>Dairy products</li>
+					<li>Cooked foods</li>
+					<li>Coloured or treated paper</li>
+					<li>Chemically treated wood</li>
+					<li>Diseased plants</li>
+					<li>Persistent weeds</li>
+				</ul>
+			</p>
+
+			</p>
+			<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button Computers start here -->
+<div data-role="page" id="computer" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Computers</h1>
+<a href="#diyvideo5" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/computerpic.jpg" width="250px" height="250px">
+			<br>
+			<p>Electronic rubbish, and computer equipment in particular, is a rapidly expanding stream of world waste. Low prices allow consumers to replace "gadgets" often, and rapid technological change means there are always newer, better, more powerful products on the market. The result is a burgeoning computer waste mountain. Up to 20 million “obsolete” PCs are discarded annually in the USA alone.</p>
+
+			<p>
+				<h3>Why is it important to recycle computer equipments?</h3>
+
+			<p>Also known as e-waste, discarded computer equipment comprises monitors, printers, hard drives and circuit boards. Such items should on no account be thrown out with your household rubbish because they contain toxic substances, and are effectively hazardous waste. E-waste often ends up in the developing world, and the UN’s Environment Programme is alarmed by the amount of electronic goods which is improperly disposed of overseas. There is increasing concern about the pollution caused by hazardous chemicals and heavy metals in Africa, Asia and South America.</p>
+
+			<h4>What`s in my PC?</h4>	
+			<table border="1" align="center">
+				<tr>
+					<th>Material</th>
+					<th>Proprotion</th>
+				</tr>
+				<tr>
+					<td>Plastic</td>
+					<td>23%</td>
+				</tr>
+				<tr>
+					<td>Ferrous metals</td>
+					<td>32%</td>
+				</tr>
+				<tr>
+					<td>Non-ferrous metals</td>
+					<td>18%</td>
+				</tr>
+				<tr>
+					<td>Electronic metals</td>
+					<td>12%</td>
+				</tr>
+				<tr>
+					<td>Glass</td>
+					<td>15%</td>
+				</tr>
+			</table>			
+
+			</p>
+			<p>A single computer can contain up to 2kg of lead, and the complex mixture of materials make PCs very difficult to recycle.</p>
+
+			<p>
+				<h3>Disposal options</h3>
+				<p>You can dispose of computer waste by returning the product to the manufacturer, taking the item to a professional waste disposal facility or donating the goods to a non-profit organisation.</p>
+			</p>
+				
+			<br>
+						<br>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button electrical start here -->
+<div data-role="page" id="electrical_equipment" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Electrical Equipment</h1>
+<a href="#diyvideo6" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/electricalpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Most electrical equipment can be reused or broken down into parts.</li>
+					<li>If the electrical equipment is still in full working order, sell it in a car boot sale or donate it to a charity shop.</li>
+					<li>Contact your retailer as they may take back old products.</li>
+					<li>Some councils accept electrical equipment at their waste recycling centres.</li>
+					<li>Always try to repair items rather than throwing them away, others may find a use for the item when you no longer want it.</li>
+					<li>Try to buy electrical items that have a long life span.</li>
+				</ul>
+			</p>
+				<br>
+			
+			<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button furniture start here -->
+<div data-role="page" id="furniture" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Furniture</h1>
+<a href="#diyvideo7" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/furniturepic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Donate usable furniture to charity shops, schools, community centres, friends or neighbours.</li>
+					<li>Sell furniture at garage sales or in auctions.</li>
+					<li>Clean and repair broken furniture before you sell/donate it.</li>
+
+				</ul>
+			</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button glass start here -->
+<div data-role="page" id="glass" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Glass</h1>
+<a href="#diyvideo8" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<img src="img/glasspic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Glass is separated into 3 colours: green, brown and clear.</li>
+					<li>Take great care when handling broken glass, wear gloves if possible.</li>
+					<li>Deposit glass at your nearest recycling bank by throwing them into the appropriate container.</li>
+					<li>Many supermarkets have glass-recycling banks, enabling you to recycle glass on your weekly shop.</li>
+					<li>Most home recycle bins, provided by your local council, usually accept glass.</li>
+					<li>Make sure you wash out the bottle or jar before putting it into recycling bins.</li>
+					<li>Reuse glass whenever possible. Jars can be used as small containers and bottles can be used as vases.</li>
+				</ul>
+			</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button metal start here -->
+<div data-role="page" id="metal" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Metal</h1>
+<a href="#diyvideo9" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/metalpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Metal is usually separated into 2 groups: aluminium and steel.</li>
+					<li>You can test which metal your waste is by using a magnet. Aluminium metal is non-magnetic whereas steel is magnetic.</li>
+					<li>There may be a symbol, such as an alu mark, on the product to indicate what metal it is made from.</li>
+					<li>Drink cans are usually made from aluminium and food cans are usually made from steel.</li>
+					<li>Most home recycling bins, provided by your local council, usually accept metal.</li>
+					<li>Deposit used cans at your local recycling bank.</li>
+					<li>Make sure drink and food cans are clean before recycling.</li>
+					<li>Aerosol containers can be recycled, but only when they are completely empty.</li>
+					<li>Metallic plastic film, such as chocolate wrappers, cannot be recycled.</li>
+				</ul>
+			</p>
+				<br>
+						
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button mobiles start here -->
+<div data-role="page" id="mobiles" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Mobiles</h1>
+<a href="#diyvideo10" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/mobilepic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Most people now own a mobile phone and they can be recycled.</li>
+					<li>Donate old mobile phones to friends or family.</li>
+					<li>Many manufacturers take back old mobile phones for recycling.</li>
+					<li>Some companies have set up mobile phone recycling schemes.</li>
+				</ul>
+			</p>
+			<p>In Mauritius, Orange has launched a national program to develop the recycling of mobile phones and batteries in partnership with BEM Enterprises Ltd, the Port Louis Citadelle Rotary Club and the Mission Verte association. Some 15 collection points have been set up at Orange stores. The collected equipment is grouped together and then transported to the BEM Enterprises sorting centre. Plastics and metals are routed to local recycling centres. Batteries, chargers and other electronic circuits for which there is no local processing channel are sent to Europe for recovery at approved recycling centres.</p>
+
+			<p>Orange (Mauritius) and Mission Verte joint green initiative has launched a collection & recycling campaign for old phones and wasted batteries. The aim was to reduce noxious liquid that may be released from the battery and cause harm to the environment for example contaminating the water in Mauritius while other parts of the phone will be recycled. Collection or disposable points will be situated in all Orange shop outlets across the island. For the period year 2007, according to the Central Statistics, Mauritius has imported a whopping  175,000 cellular phones while batteries 25 million batteries.</p>
+
+				<br>
+						
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button paint start here -->
+<div data-role="page" id="paint" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Paint & Oil</h1>
+<a href="#diyvideo11" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+		<img src="img/paintpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Waste such as paint, paintbrushes, car oil and oil filters have to be carefully disposed of, as they can be very damaging to the environment.</li>
+					<li>Don’t pour oil or paint down the drain.</li>
+					<li>Donate unwanted paints and varnishes, as others can reuse them.</li>
+					<li>Look for disposal or recycling instructions on the packaging of the product.</li>
+					<li>Civic amenity sites often take engine oil for recycling.</li>
+					<li>Buy products in bulk whenever possible to reduce packaging waste.</li>
+					<li>Use eco-friendly alternatives whenever possible.</li>
+				</ul>
+			</p>
+
+			<p>
+				<h3>Recycling Engine Oil</h3>
+			It is important that you recycle your engine oil correctly as even a small amount of oil can cause damage to the environment as well as making a noticable mess.</p>
+
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button batteries start here -->
+<div data-role="page" id="paper" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Paper</h1>
+<a href="#diyvideo12" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/paperpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Paper is separated into the following groups:</li>
+					<ul>
+						<li>Magazines</li>
+						<li>Newspapers</li>
+						<li>Office paper</li>
+						<li>Cardboard</li>
+						<li>Phone directories</li>
+					</ul>
+					<li>Deposit used paper at your local recycling bank.</li>
+					<li>Most home recycling bins, provided by your local council, usually accept paper products.</li>
+					<li>Only recycle gummed paper if specified, such as envelopes and stickers.</li>
+					<li>Reduce paper waste by cancelling unwanted deliveries, or read news online as opposed to buying newspapers.</li>
+					<li>Put a ‘no junk mail please’ sign on your letter box to reduce unwanted deliveries.</li>
+					<li>Reuse paper around the home as scrap paper or packing material. Envelopes can also be reused.</li>
+					<li>Set your printer to print on both sides of the paper.</li>
+					<li>Buy recycled paper whenever possible.</li>
+					</ul>
+			</p>
+				<br>
+						
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button plastic start here -->
+<div data-role="page" id="plastic" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Plastic</h1>
+<a href="#diyvideo13" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/plasticpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>There are about 7 different types of plastic. The main types include:</li>
+					<ul type="circle">
+						<li>HDPE – Opaque bottles</li>
+						<li>PVC – Transparent bottles, with a seam running across the base</li>
+						<li>PET – Transparent bottles, with a hard moulded spot in the centre of the base</li>
+					</ul>
+					<li>If your home recycling bin doesn’t take plastic bottles, then deposit them at your local recycling bank.</li>
+					<li>Clean bottles before recycling them.</li>
+					<li>Buy plastic bottles in bulk whenever possible to reduce packaging waste.</li>
+					<li>Carriers can be reused next time you’re at the shops, or deposit used ones at collection points provided by some supermarkets.</li>
+				</ul>
+			</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button printer cartridges start here -->
+<div data-role="page" id="printer_ink" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Printer Cartridges</h1>
+<a href="#diyvideo14" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<img src="img/inkpic.jpg"  width="250px" height="250px">
+			<br>
+			<p>Recycling printer cartridges really is worthwhile as cartridges can be expensive and remanufactured printer cartridges can cost as little as 10% of what original cartridges do. By lessening the amount of cartridges ending up in landfill sites, you are being kinder to the environment too.</p>
+			<p>
+				<h3>Recycling Box</h3>
+				<p>
+				RecyclingBox operate a zero to landfill policy and are committed to recycling and remanufacturing your used cartridges. Simply order a recycling box, arrange for collection, and they’ll do the rest!</p>
+
+				<p>Unlike other service providers, Recycling Box will recycle all types of Inkjet and Toner cartridges, as they realise the importance this has on the environment. The cartridges are either sent to the European Business products (EBP) to be remanufactured, or broken down to their components and recycled.</p>
+
+				<p>
+					Recycling Box incentives include:
+					<ul>
+						<li>Low cost boxes and collection</li>
+						<li>Recycle and remanufacture all types of inkjet and toner cartridges</li>
+						<li>Knowing your recycled goods are helping to donate over £6,000,000 to charities</li>
+					</ul>
+				</p>
+
+			</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button recycling banks start here -->
+<div data-role="page" id="recycling_bank" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Recycling Banks</h1>
+<a href="#diyvideo15" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/bankspic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>As well as home recycling bins, there are many recycling banks across the UK that can be used to recycle different materials. They are located on streets across the UK as well as in supermarkets and outside housing estates.</p>
+
+				<p>Most recycling banks are emptied on a regular basis. However, if you do come across one that is over-flowing, contact your local council who will arrange for the bank to be emptied. You can also contact your local council to report vandalism to the recycle banks.</p>
+
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button textile start here -->
+<div data-role="page" id="textiles" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Textiles</h1>
+<a href="#diyvideo16" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/textilepic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Most home recycling bins, provided by your local council, accept old clothes and textiles. Recycling banks may also accept old clothes.</li>
+					<li>Donate old clothes to charity shops or take them to a jumble sale.</li>
+					<li>Only donate clothes that are still usable.</li>
+					<li>Old clothes can be used to make other textile items, such as cushion covers or cleaning cloths.</li>
+					<li>When donating shoes, make sure they are tied together so they don’t separate.</li>
+				</ul>
+			</p>
+				<br>
+		
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page  -->
+
+<!-- page button Vehicles start here -->
+<div data-role="page" id="vehicles" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Vehicles</h1>
+<a href="#diyvideo17" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/vehiclepic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Up to 80% of a vehicle can be recycled, see below for where to take your vehicle for recycling.</li>
+					<li>Try and fix your vehicle instead of throwing it away.</li>
+					<li>Sell unwanted vehicles.</li>
+					<li>Report abandoned vehicles to your local council for removal.</li>
+				</ul>
+			</p>
+
+			<p>There are hundreds of approved vehicle dismantlers, recyclers and salvage sites across the UK. Find your nearest site.</p>
+			<p>Visit The Motor Vehicle Dismantlers Association website for a full list of members, all of whom are properly licensed by the Environment Agency and can treat End of Life Vehicles in accordance with all current legislation, including issuing the DVLA required Certificate of Destruction.</p>
+
+			<p>Read about the new EU legislation which has recently come into force and aims to improve the recycling process for old vehicles.</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page button wood start here -->
+<div data-role="page" id="wood" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>	
+
+			<h1>Wood</h1>
+<a href="#diyvideo18" class="ui-btn ui-shadow ui-btn-icon-left ui-icon-myiconrecycle">DIY</a>
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<img src="img/woodpic.jpg"  width="250px" height="250px">
+			<br>
+			
+			<p>
+				<ul>
+					<li>Take wood to civic amenity sites for recycling.</li>
+					<li>Wood can often be reused to make other items, such as a bird table for your garden.</li>
+					<li>Wood can often be added to your compost heap, such as sawdust and wood shavings.</li>
+					<li>Buy recycled wood whenever possible.</li>
+				</ul>
+			</p>
+				<br>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<div data-role="page" id="pagescience" data-transition="slide" data-theme="a">
+
+<div data-role="header">
+	
+<div class="topnav">
+  
+  <div class="search-container">
+    <form action="/action_page.php">
+      <input align="right" type="text" type="submit" placeholder="Search.." name="search">
+    </form>
+  </div>
+</div>
+
+			<h1>Recycle Guide</h1>
+			
+			<div data-role="navbar" class="topnav">
+				
+				
+				<ul>
+					<li><a href="#pageone" class="active" data data-icon="home">Home</a></li>
+					<li><a href="#pagecat" data-transition="slide" data-icon="grid">Category</a></li>
+					<li><a href="#pagediy" data-transition="slide" data-icon="recycle">DIY</a></li>
+					<li><a href="#pagescience" data-transition="slide" class="ui-shadow ui-icon-myicon" data-icon="data-science">science</a></li>
+					<div class="dropdown">
+					<li class="dropdown"><a href="#pagelocation" class="dropdown"  data-transition="slide" class="ui-shadow ui-icon-myiconlocation" data-icon="location">Recycling</a>
+						<div class="dropdown-content">
+						<a href="geo_paper.html">Paper</a>
+						<a href="">Plastic</a>
+						<a href="">Carton</a>
+						<a href="">Electric</a>
+						<a href="">Glass</a>
+						<a href="">Printing</a></div>
+					</li>
+					</div>
+				</ul>
+			</div>
+		</div> <!-- hearder 1 -->
+
+<div data-role="header"> <!-- Toolbar -->
+
+				
+			<h1>The Recycling Cycle</h1>
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+		
+			<img src="img/sciencepic.png">
+
+			<div id="accordionrecycle" data-dialog="true">
+
+
+		<button class="accordion">Learn how paper is recycled</button>
+		<div class="panel">
+
+			<p>
+				<img src="img/paperrecycle1.png">
+				<p>Paper is taken from the bin and deposited in a large recycling container along with paper from other recycling bins.</p>
+			</p>
+			
+			<p>
+				<img src="img/paperrecycle2.png">
+				<p>The paper is taken to a recycling plant where it is separated into types and grades.</p>
+			</p>
+
+			<p>
+				<img src="img/paperrecycle3.png">
+				<p>The separated paper is then washed with soapy water to remove inks, plastic film, staples and glue. The paper is put into a large holder where it is mixed with water to create ‘slurry’.</p>
+			</p>
+
+			<p>
+				<img src="img/paperrecycle4.png">
+				<p>By adding different materials to the slurry, different paper products can be created, such as cardboard, newsprints or office paper.</p>
+			</p>
+
+			<p>
+				<img src="img/paperrecycle5.png">
+				<p>The slurry is spread using large rollers into large thin sheets.</p>
+			</p>
+
+			<p>
+				<img src="img/paperrecycle6.png">
+				<p>The paper is left to dry, and then it is rolled up ready to be cut and sent back to the shops.</p>
+			</p>
+
+		</div>
+
+		<button class="accordion">How glass is recycled</button>
+		<div class="panel">
+		
+			<p>
+				<p>
+				<img src="img/glassrecycle1.png">
+				<p>The consumer throws glass into a recycle bin.</p>
+			</p>
+
+			<p>
+				<img src="img/glassrecycle2.png">
+				<p>Glass is taken from the bin and taken to a glass treatment plant.</p>
+			</p>
+
+			<p>
+				<img src="img/glassrecycle3.png">
+				<p>The glass is sorted by colour and washed to remove any impurities.</p>
+			</p>
+
+			<p>
+				<img src="img/glassrecycle4.png">
+				<p>The glass is then crushed and melted, then moulded into new products such as bottles and jars. Or it may be used for alternative purposes such as brick manufacture or decorative uses.</p>
+			</p>
+
+			<p>
+				<img src="img/glassrecycle5.png">
+				<p>The glass is then sent back to the shops ready to be used again.</p>
+			</p>
+
+			<p>
+				<img src="img/glassrecycle6.png">
+				<p>Glass does not degrade through the recycling process, so it can be recycled again and again.</p>
+			</p>
+
+		</div>
+
+		<button class="accordion">How aluminium is recycled</button>
+		<div class="panel">
+			
+
+			<p>
+				<p>
+				<img src="img/aluminiumrecycle1.png">
+				<p>The consumer throws aluminium cans and foil into a recycle bin.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle2.png">
+				<p>The aluminium is then collected and taken to a treatment plant.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle3.png">
+				<p>In the treatment plant the aluminium is sorted and cleaned ready for reprocessing.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle4.png">
+				<p>It then goes through a re-melt process and turns into molten aluminium, this removes the coatings and inks that may be present on the aluminium.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle5.png">
+				<p>The aluminium is then made into large blocks called ingots. Each ingot contains about 1.6 million drinks cans.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle6.png">
+				<p>The ingots are sent to mills where they are rolled out, this gives the aluminium greater flexibility and strength.</p>
+			</p>
+			
+			<p>
+				<img src="img/aluminiumrecycle7.png">
+				<p>This is then made into aluminium products such as cans, chocolate wrapping and ready meal packaging.</p>
+			</p>
+
+			<p>
+				<img src="img/aluminiumrecycle8.png">
+				<p>In as little as 6 weeks, the recycled aluminium products are then sent back to the shops ready to be used again.</p>
+			</p>
+
+		</div>
+			
+				
+			</div>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page  -->
+
+
+<!-- page diy start here -->
+<div data-role="page" id="pagediy" data-theme="a">
+
+<div data-role="header">
+	
+<div class="topnav">
+  
+  <div class="search-container">
+    <form action="/action_page.php">
+      <input align="right" type="text" type="submit" placeholder="Search.." name="search">
+    </form>
+  </div>
+</div>
+
+			<h1>Recycle Guide</h1>
+			
+			<div data-role="navbar" class="topnav">
+				
+				
+				<ul>
+					<li><a href="#pageone" class="active" data data-icon="home">Home</a></li>
+					<li><a href="#pagecat" data-transition="slide" data-icon="grid">Category</a></li>
+					<li><a href="#pagediy" data-transition="slide" data-icon="recycle">DIY</a></li>
+					<li><a href="#pagescience" data-transition="slide" class="ui-shadow ui-icon-myicon" data-icon="data-science">science</a></li>
+					<div class="dropdown">
+					<li class="dropdown"><a href="#pagelocation" class="dropdown"  data-transition="slide" class="ui-shadow ui-icon-myiconlocation" data-icon="location">Recycling</a>
+						<div class="dropdown-content">
+						<a href="geo_paper.html">Paper</a>
+						<a href="">Plastic</a>
+						<a href="">Carton</a>
+						<a href="">Electric</a>
+						<a href="">Glass</a>
+						<a href="">Printing</a></div>
+					</li>
+					</div>
+				</ul>
+			</div>
+		</div> <!-- hearder 1 -->
+
+			<h2>DIY</h2>
+
+
+		<div role="main" id="diy" class="ui-content">
+		<center>
+		<a href="#diyvideo1"><img src="img/batterydiy.png" width="100px" height="100px"></a>
+		
+		<a href="#diyvideo2"><img src="img/Materialdiy.png" width="100px" height="100px"></a>
+		<a href="#diyvideo3"><img src="img/wastediy.png" width="100px" height="100px"></a>
+		 
+		 <br>
+		 <a href="#diyvideo4"><img src="img/compostdiy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo5"><img src="img/computerdiy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo6"><img src="img/elecdiy.png" width="100px" height="100px"></a>
+		 
+		 <br>
+		 <a href="#diyvideo7"><img src="img/furniturediy.jpg" width="100px" height="100px"></a>
+		 <a href="#diyvideo8"><img src="img/glassdiy.jpg" width="100px" height="100px"></a>
+		 <a href="#diyvideo9"><img src="img/metaldiy.jpg" width="100px" height="100px"></a>
+		
+		 <br>
+		 <a href="#diyvideo10"><img src="img/mobilediy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo11"><img src="img/paintdiy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo12"><img src="img/paperdiy.png" width="100px" height="100px"></a>
+		
+		 <br>
+		 <a href="#diyvideo13"><img src="img/plasticdiy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo14"><img src="img/inkdiy.jpg" width="100px" height="100px"></a>
+		 <a href="#diyvideo15"><img src="img/binsdiy.jpg" width="100px" height="100px"></a>
+		 
+		 <br>
+		 <a href="#diyvideo16"><img src="img/textilediy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo17"><img src="img/vehiclediy.png" width="100px" height="100px"></a>
+		 <a href="#diyvideo18"><img src="img/wooddiy.png" width="100px" height="100px"></a>
+			
+			</center>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!--geolocation for glass-->
+<div data-role="page" id="pageglass" data-theme="a">
+ <div data-role="header">
+ <h1> Glass Recyclers in Mauritius</h1>
+ </div>
+
+ <div data-role="main" class="ui-content">
+ <div id="mapid" style="width: 1400px;height: 800px;">
+
+</div>
+ <div data-role="footer">
+ <h1>Geolocation</h1>
+ </div>
+</div>
+</div>
+
+<!-- page diyvideo1 start here -->
+<div data-role="page" id="diyvideo1" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<h2>How are Batteries recycled?</h2>
+			<p>First you may be asking can you recycle batteries, all of them? Yes, you can! The following is a brief description of how each major chemistry of battery is recycled at a recycling facility. This section you will learn how to dispose of batteries properly, by recycling them, not landfilling them.</p>
+
+			<iframe src="https://www.youtube.com/embed/KUmlCH7bTO8" id="video" frameborder="0" gesture="media" allowfullscreen></iframe>
+
+			<h3>Lead Acid</h3>
+<p>The battery is broken apart in a hammer mill, a machine that hammers the battery into pieces. The broken battery pieces are then placed into a vat, where the lead and heavy materials fall to the bottom and the plastic floats. At this point, the polypropylene pieces are scooped away and the liquids are drawn off, leaving the lead and heavy metals. Each of the materials goes into a different recycling “stream”.</p>
+
+<h3>Plastic</h3>
+
+<p>Polypropylene pieces are washed, blown dry and sent to a plastic recycler where the pieces are melted together into an almost liquid state. The molten plastic is put through an extruder that produces small plastic pellets of a uniform size. The pellets are put back into manufacturing battery cases and the process begins again.</p>
+
+<h3>Lead</h3>
+
+<p>Lead grids, lead oxide and other lead parts are cleaned and heated within smelting furnaces. The molten melted lead is then poured into ingot molds. After a few minutes, the impurities float to the top of the still molten lead in the ingot molds. These impurities are scraped away and the ingots are left to cool. When the ingots are cool, they’re removed from the molds and sent to battery manufacturers, where they’re re-melted and used in the production of new batteries.</p>
+
+<h3>Sulfuric Acid</h3>
+
+<p>Old battery acid can be handled in two ways: 1. The acid is neutralized with an industrial compound similar to household baking soda. Neutralization turns the acid into water. The water is then treated, cleaned, tested in a waste water treatment plant to be sure it meets clean water standards. 2. The acid is processed and converted to sodium sulfate, an odorless white powder that’s used in laundry detergent, glass and textile manufacturing.<p>
+
+<p>Lead acid batteries are closed-loop recycled, meaning each part the the old batteries is recycled into a new battery. It is estimated that 98% of all lead acid batteries are recycled.</p>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo2 start here -->
+<div data-role="page" id="diyvideo2" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<h2>Reuse and recycling</h2>
+<p>Many building materials can be reused or recycled.<p>
+
+The ability to reuse and recycle materials salvaged from demolition and building sites for reuse and recycling depends on:
+<li>local recycling facilities</li>
+<li>market demand</li>
+<li>quality and condition of materials and components</li>
+<li>time available for salvage</li>
+<li>emphasis put on reuse and recycling.</li>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo3 start here -->
+<div data-role="page" id="diyvideo3" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<h2>Reduce, Reuse, Recycle: Reprocessing Medical Devices</h2>
+
+			<iframe src="https://www.youtube.com/embed/juNcRHG6li8" id="video" frameborder="0" gesture="media" allowfullscreen></iframe>
+
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo4 start here -->
+<div data-role="page" id="diyvideo4" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			<h2>How to Make Compost</h2>
+<p>Learn about the simple ingredients and processes that allow you to make great garden compost at home.</p>
+
+<img src="img/com.jpeg" width="500px" height="500px"></a>
+<p>ome composting is a process that uses natural decomposition to transform landscape and kitchen waste into a rich soil amendment that does wonders for a garden. Decomposers, like bacteria, fungi, insects, nematodes, earthworms and other composting critters, are a composter’s best friend. As soon as plant material begins to decay, decomposers arrive to speed up the process. It’s helpful to know a little about these often unseen workers, because when they’re happy, they eat, and when they eat, compost happens. </p>
+
+<p>Your compost pile needs four ingredients to become a home for decomposers: carbon, nitrogen, moisture and air. The first ingredient, carbon, which can be found in fall leaves, straw, woodchips, recycled paper and cardboard. Tree care companies are often charged a fee to dump their woodchips in landfills, and they may welcome an opportunity to donate some material to a home composter. Be sure that you have enough space for a load of woodchips that can be easily accessed by a large truck. Specify the exact number of loads you need, or you may come home to a mountain of woodchips in your driveway!</p>
+
+<p>Microscopic decomposers need nitrogen to help them break down the carbon. Nitrogen comes into the pile in the form of green plant tissue. This can be freshly cut grass clippings, hedge clippings, vegetable kitchen scraps, coffee grounds, tea bags, juice pulp, spent annual plants, or finished manure from vegetarian animals (that’s chickens and cows rather than cats and dogs). As bacteria use nitrogen to break down carbon, they release heat. Heat is a good thing because it speeds up decomposition.</p>
+
+<p>Dry material resists decomposition, and earthworms, fungi and bacteria need moisture to live. To make compost, the pile needs to stay damp. Sprinkling water as you add each layer of ingredients to your bin is a good way to make sure your pile starts off with the right moisture level.</p>
+
+<p>On the other hand, swampy conditions can drive air out of the pile. Some of the most helpful composting bacteria (psychophiles, mesophiles and thermophiles) need oxygen to work. If the pile is too wet, or if it isn’t vented or turned regularly, they may run out of enough oxygen to stay alive and keep eating. Add air by turning your homemade compost with a pitchfork or poking holes deep into the pile with a pole or stick.</p>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo5 start here -->
+<div data-role="page" id="diyvideo5" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<h2>How to Recycle Computers</h2>
+<p>When it comes to recycling laptops, even one makes a big difference — recycling one million laptops saves enough energy to power 3,500 U.S. homes for an entire year, according to the EPA. Plus, the inside of your computer contains valuable metals like gold, silver and platinum that can be recovered and reused. The easiest way to make sure your computer is properly recycled is to take it to a local retailer with a computer recycling program. To find one near you, check out our Recycling Locator at the bottom of this page. Before recycling your computer, here are a few preparation steps:</p>
+
+<p>Remove all data from your computer to prevent identity theft. You may want to back up important files on an external hard drive.</p>
+<p>Unplug the computer peripherals (keyboard, speakers, etc.) from your desktop or laptop. You can likely recycle these parts as well using the same company where you take the machine, but consider reusing them or donating them since they won’t need a software upgrade to work on a new computer.</p>
+<p>For a laptop, flip it over and see if you can remove the battery. Many laptops use lithium-ion batteries, which require special transportation for recycling, so this is especially important if using a manufacturer mail-back program.</p>
+
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo6 start here -->
+<div data-role="page" id="diyvideo6" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<h2>Advice on recycling electrical goods</h2>
+<p>Recycling is the safest and most responsible way to dispose of electrical item that are faulty or otherwise beyond repair. Read on to discover advice about recycling everything from large kitchen appliances through to handheld gadgets.</p>
+
+<h3>Why recycle electrical items?</h3>
+<p>170 million new electrical items are purchase in the UK each year, but we currently recycle less than a third of these when they come to the end of their lifecycle.</p>
+
+<p>Electrical and electronic equipment is made up of a wide variety of materials, many of which can be reused (for example, there’s enough steel in an iron to produce 13 steel cans).</p>
+
+<p>By recycling your old and unwanted electrical items, you’re doing your bit to help the environment by preventing potentially hazardous waste from entering landfill and causing soil and water contamination.</p>
+
+<h3>What is the Waste Electrical and Electronic Equipment (WEEE) Directive?</h3>
+<p>The Waste Electrical and Electronic Equipment (WEEE) Directive, which was first introduced in 2007, governs how manufacturers and retailers in European countries behave in regards to recycling.<p>
+
+<p>The regularly-updated WEEE directive is designed to ensure that less harmful electrical waste is sent to landfill; though the regulations don’t directly affect consumers, they do ultimately make it simpler for you to recycle your old electrical goods.</p>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo7 start here -->
+<div data-role="page" id="diyvideo7" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<iframe src="https://www.youtube.com/embed/OE4BVOjJp88" id="video" frameborder="0" gesture="media" allowfullscreen></iframe>
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo8 start here -->
+<div data-role="page" id="diyvideo8" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<p>Have you ever painted glass? This is such a fun craft and one that creates such beautiful décor for your home. Painted glass is pretty easy and it makes a wonderful gift. If you have never tried it, now is the time. I’ve found 25 of the most creative and gorgeous glass painting projects that you can do that will give you beautiful new décor for your home. These all range from vases to calendars and some of the most fabulous dishes you have ever seen.</p>
+
+
+			<iframe  src="https://www.youtube.com/embed/3z8M8ZrxAmA" id="video" frameborder="0" gesture="media" allowfullscreen></iframe>
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo9 start here -->
+<div data-role="page" id="diyvideo9" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			<h2>DIY-Metal Crafts</h2>
+			<iframe src="https://www.youtube.com/embed/6rK9S1ulqxQ" id="video" frameborder="0" gesture="media" allowfullscreen></iframe>
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo10 start here -->
+<div data-role="page" id="diyvideo10" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo11 start here -->
+<div data-role="page" id="diyvideo11" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo12 start here -->
+<div data-role="page" id="diyvideo12" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo13 start here -->
+<div data-role="page" id="diyvideo13" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagecat" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo14 start here -->
+<div data-role="page" id="diyvideo14" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagediy" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo15 start here -->
+<div data-role="page" id="diyvideo15" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagediy" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo16 start here -->
+<div data-role="page" id="diyvideo16" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagediy" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo17 start here -->
+<div data-role="page" id="diyvideo17" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagediy" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+<!-- page diyvideo18 start here -->
+<div data-role="page" id="diyvideo18" data-theme="a">
+
+		<div data-role="header"> <!-- Toolbar -->
+
+		<a href="#pagediy" class="ui-btn ui-icon-back ui-btn-icon-left">Back</a>			
+
+		</div> <!-- hearder 2 -->
+
+		<div role="main" class="ui-content">
+			
+			
+		</div>
+
+		<div data-role="footer">
+			<h2> &copy  Recycle Guide 2019  </h2>
+		</div>
+</div> <!-- end of page   -->
+
+
+<script>
+	function displaymenu(){
+		
+
+	}
+
+	var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "block") {
+      panel.style.display = "none";
+    } else {
+      panel.style.display = "block";
+    }
+  });
+}
+
+
+
+</script>
+
+
+</body>
+</html>
